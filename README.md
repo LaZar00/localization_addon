@@ -9,8 +9,8 @@ Contact: formerly ClanDLAN.net member, now in Discord.
 
 This module includes some updates for localized versions (coded for the spanish translation):
 * a. Now the '$' symbol of the money appears at the right of the value	(client.dll)
-* b. Months and Days names	(FileSystem_Stdio.dll)
-* c. 'Quick Save' and 'Auto Save' words	(engine.dll)
+* b. Months and Days names in Load/Save window	(FileSystem_Stdio.dll)
+* c. 'Quick Save' and 'Auto Save' words in Load/Save window	(engine.dll)
 * d. Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
 		This text appears 2 times:\
   		1. When we run for first time Vampire.exe. In this case, loader has not reached yet the module and updated any text.\
