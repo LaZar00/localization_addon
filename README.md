@@ -7,7 +7,7 @@ Date: 27/03/2025\
 Version: 1.0 for spanish translation based on UP 11.5 (rc14.1)\
 Contact: formerly ClanDLAN.net member, now in Discord.
 
-This module includes some updates for the spanish translation:
+This module includes some updates for localized versions (coded for the spanish translation):
 * a. Now the '$' symbol of the money appears at the right of the value	(client.dll)
 * b. Months and Days names	(FileSystem_Stdio.dll)
 * c. 'Quick Save' and 'Auto Save' words	(engine.dll)
