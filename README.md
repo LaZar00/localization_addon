@@ -20,7 +20,7 @@ This module includes some updates for localized versions (coded for the spanish 
 
 # Install
 
-You will need to install this in \Bin\loader folder in the path where Vampire the Masquerade - Bloodlines has been installed.
+You will need to install this in `\Bin\loader` folder in the path where Vampire the Masquerade - Bloodlines has been installed.
 You can enable (1) or disable (0) the features modifying the .ini file.
 Unofficial Patch 11.5rc14.1 by Wesp5 required.
 
