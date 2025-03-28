@@ -6,7 +6,7 @@ I decided to code this external module to avoid changing the original libraries 
  
 Author: L@Zar0\
 Date: 27/03/2025\
-Version: 1.0 for spanish translation based on UP 11.5 (rc14.1)\
+Version: 1.0 for spanish translation based on UP 11.5\
 Contact: formerly ClanDLAN.net member, now in Discord.
 
 This module includes some updates for localized versions (coded for the spanish translation):
@@ -24,7 +24,7 @@ This module includes some updates for localized versions (coded for the spanish 
 
 You will need to install this in `\Bin\loader` folder in the path where Vampire the Masquerade - Bloodlines has been installed.
 You can enable (1) or disable (0) the features modifying the .ini file.
-Unofficial Patch 11.5rc14.1 by Wesp5 required.
+Unofficial Patch 11.5 by Wesp5 required.
 
 # Acknowledgements
 + Niko from Planet Vampire Discord in appointing me to documentation for coding this.
