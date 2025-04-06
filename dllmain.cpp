@@ -17,7 +17,7 @@
 //			2. After loading modules, and before intro cinematics.
 //			   In this case, the loader has reached the module and has updated texts.
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
-//  e.- Sometimes the game shows (press 1 to continue)			(client.dll)
+//  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
 
 #include "pch.h"
 #include <windows.h>
@@ -89,7 +89,7 @@ extern "C" __declspec(dllexport) void loaded_client()
 			SafeWriteBuf(addr, symbolDollar_1, 3);
 		}
 
-		//  e.- Sometimes the game shows (press 1 to continue)
+		//  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
 		if (GetPrivateProfileIntA("PressOne", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("PressOne",
