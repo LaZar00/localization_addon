@@ -17,6 +17,7 @@
 //			2. After loading modules, and before intro cinematics.
 //			   In this case, the loader has reached the module and has updated texts.
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
+//  e.- Sometimes the game shows (press 1 to continue)			(client.dll)
 
 #include "pch.h"
 #include <windows.h>
@@ -88,6 +89,18 @@ extern "C" __declspec(dllexport) void loaded_client()
 			SafeWriteBuf(addr, symbolDollar_1, 3);
 		}
 
+		//  e.- Sometimes the game shows (press 1 to continue)
+		if (GetPrivateProfileIntA("PressOne", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("PressOne",
+									 "Text",
+									 "(press 1 to continue)",
+									 value, 24, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)client + 0x285CA8;
+			SafeWriteBuf(addr, value, 23);
+		}
+
 	}
 
 	HMODULE FileSystem_Stdio = GetModuleHandleA("FileSystem_Stdio.dll");
@@ -155,8 +168,9 @@ extern "C" __declspec(dllexport) void loaded_client()
 				value, 12, ".\\Bin\\loader\\localization_addon.ini");
 
 			addr = (UInt32)engine + 0x1AD510;
-			SafeWriteBuf(addr, value, 12);
+			SafeWriteBuf(addr, value, 11);
 		}
+
 	}
 
 // For tracing if we access .ini file
