@@ -19,6 +19,7 @@ This module includes some updates for localized versions (coded for the spanish 
 		2. After loading modules, and before intro cinematics. In this case, the loader has reached the module and has updated texts.
   
 		In any case, I prefer to avoid changing 'engine.dll' directly.
+* e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
 
 # Install
 
