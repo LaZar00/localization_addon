@@ -82,7 +82,7 @@ extern "C" __declspec(dllexport) void loaded_client()
 			addr = (UInt32)client + 0x2CFB17;
 			SafeWriteBuf(addr, symbolDollar_1, 3);
 
-			addr = (UInt32)client + 0x2D2EE;
+			addr = (UInt32)client + 0x2D22EE;
 			SafeWriteBuf(addr, symbolDollar_2, 5);
 
 			addr = (UInt32)client + 0x2D7924;
