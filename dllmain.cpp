@@ -213,10 +213,19 @@ extern "C" __declspec(dllexport) void loaded_client()
 			GetPrivateProfileStringA("Current",
                                      "Text",
 				                     "Current",
-                                     value, 8, ".\\Bin\\loader\\localization_addon.ini");
+                                     value, 16, ".\\Bin\\loader\\localization_addon.ini");
+                                     //value, 8, ".\\Bin\\loader\\localization_addon.ini");
 
-			addr = (UInt32)GameUI + 0x64C7C;
-			SafeWriteBuf(addr, value, 7);
+			//addr = (UInt32)GameUI + 0x64C7C;
+			//SafeWriteBuf(addr, value, 7);
+
+			// Update address
+			addr = (UInt32)GameUI + 0x1838B;
+			unsigned char CurrentAddress[2] = { 0xDC, 0x67 };
+			SafeWriteBuf(addr, CurrentAddress, 2);
+
+			addr = (UInt32)GameUI + 0x667DC;
+			SafeWriteBuf(addr, value, 16);
 		}
 	}
 
