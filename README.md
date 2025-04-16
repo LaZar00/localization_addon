@@ -17,10 +17,8 @@ This module includes some updates for localized versions (coded for the spanish 
 * c. 'Quick Save' and 'Auto Save' words in Load/Save window	(engine.dll)
 * d. Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
 		This text appears 2 times:\
-  		1. When we run for first time Vampire.exe. In this case, loader has not reached yet the module and updated any text.\
-		2. After loading modules, and before intro cinematics. In this case, the loader has reached the module and has updated texts.
-  
-		In any case, I prefer to avoid changing 'engine.dll' directly.
+  		1. When we run for first time Vampire.exe.\
+		2. After loading modules, and before intro cinematics.
 * e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
 * f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 
