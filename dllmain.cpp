@@ -52,6 +52,15 @@ void SafeWriteBuf(UInt32 addr, void* data, UInt32 len)
 	VirtualProtect((void*)addr, len, oldProtect, &oldProtect);
 }
 
+void SafeWrite8(UInt32 addr, UInt32 data)
+{
+	DWORD	oldProtect;
+
+	VirtualProtect((void*)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+	*((UInt8*)addr) = data;
+	VirtualProtect((void*)addr, 4, oldProtect, &oldProtect);
+}
+
 void SafeWrite32(UInt32 addr, UInt32 data)
 {
 	DWORD oldProtect;
@@ -224,6 +233,37 @@ extern "C" __declspec(dllexport) void loaded_client()
 	//fclose(fout);
 }
 
+
+unsigned char pushText[101];
+
+void WriteRelLibCall(UInt32 jumpSrc, UInt32 jumpTgt)
+{
+	// call rel32
+	SafeWrite8(jumpSrc, 0xE8);
+	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
+	SafeWrite8(jumpSrc + 5, 0x90);
+}
+
+int __stdcall DrawTextHook(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)
+{
+	////////////////////////////////////////////////
+	// This lines are only for testing the work with the "Loading...." text
+	//////
+	//RECT test;
+
+	//test.left = 700;
+	//test.right = 1920;
+	//test.top = 100;
+	//test.bottom = 1080;
+
+	//lprc = &test;
+
+	//format = format & DT_WORDBREAK;
+	//format = format & DT_CENTER;
+
+	return DrawTextA(hdc, (LPCSTR)pushText, cchText, lprc, format);
+}
+
 extern "C" __declspec(dllexport) void loaded_engine()
 {
 	UInt32 addr;
@@ -233,15 +273,48 @@ extern "C" __declspec(dllexport) void loaded_engine()
 	{
 		//  d.- Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
 		// Loading...
+		//if (GetPrivateProfileIntA("Loading", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		//{
+		//	GetPrivateProfileStringA("Loading",
+		//		"Text",
+		//		"Loading....",
+		//		value, 12, ".\\Bin\\loader\\localization_addon.ini");
+
+		//	addr = (UInt32)engine + 0x1AD510;
+		//	SafeWriteBuf(addr, value, 11);
+		//}
+
 		if (GetPrivateProfileIntA("Loading", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("Loading",
-				"Text",
-				"Loading....",
-				value, 12, ".\\Bin\\loader\\localization_addon.ini");
+						 "Text",
+						 "Loading....",
+						 (LPSTR)pushText, 101, ".\\Bin\\loader\\localization_addon.ini");
 
-			addr = (UInt32)engine + 0x1AD510;
-			SafeWriteBuf(addr, value, 11);
+			WriteRelLibCall((UInt32)engine + 0xFCD32, (UInt32)DrawTextHook);
+
+
+			////////////////////////////////////////////////
+			// This lines are only for testing the work with the "Loading...." text
+			//////
+			//GetPrivateProfileStringA("Loading",
+			//						 "Text",
+			//						 "Loading....",
+			//						 (LPSTR)pushText, 13000, ".\\Bin\\loader\\localization_addon.ini");
+
+			//for (int i = 0; i < 13000; i++) {
+			//	if (pushText[i] == '#') pushText[i] = 0x0D;
+			//}
+
+			//// Font Size
+			//addr = (UInt32)engine + 0xFCCF6;
+			//SafeWrite8(addr, 0x01);
+
+			//// Font Name
+			//addr = (UInt32)engine + 0x1AD51C;
+			//value[0] = 'C'; value[1] = 'o'; value[2] = 'u'; value[3] = 'r'; value[4] = 'i'; value[5] = 'e'; value[6] = 'r'; value[7] = 0x0;
+			//SafeWriteBuf(addr, value, 7);
+
 		}
 	}
 
@@ -251,6 +324,8 @@ extern "C" __declspec(dllexport) void loaded_engine()
 		//sprintf(sample, "%s", value);
 		//fputs(sample, fout);
 		//fclose(fout);
+
+
 }
 
 
