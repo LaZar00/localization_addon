@@ -18,6 +18,7 @@
 //			   In this case, the loader has reached the module and has updated texts.
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
 //  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
+//  f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 
 #include "pch.h"
 #include <windows.h>
@@ -85,6 +86,9 @@ extern "C" __declspec(dllexport) void loaded_client()
 			addr = (UInt32)client + 0x2D22EE;
 			SafeWriteBuf(addr, symbolDollar_2, 5);
 
+			addr = (UInt32)client + 0x2D231F;
+			SafeWriteBuf(addr, symbolDollar_2, 5);
+
 			addr = (UInt32)client + 0x2D7924;
 			SafeWriteBuf(addr, symbolDollar_1, 3);
 		}
@@ -95,10 +99,20 @@ extern "C" __declspec(dllexport) void loaded_client()
 			GetPrivateProfileStringA("PressOne",
 									 "Text",
 									 "(press 1 to continue)",
-									 value, 24, ".\\Bin\\loader\\localization_addon.ini");
+									 value, 36, ".\\Bin\\loader\\localization_addon.ini");
+									 // value, 24, ".\\Bin\\loader\\localization_addon.ini");
 
-			addr = (UInt32)client + 0x285CA8;
-			SafeWriteBuf(addr, value, 23);
+			//addr = (UInt32)client + 0x285CA8;
+			//SafeWriteBuf(addr, value, 23);
+			
+			// Update address
+			addr = (UInt32)client + 0x54339;
+			unsigned char PressOneAddress[2] = { 0x30, 0x8A };
+			SafeWriteBuf(addr, PressOneAddress, 2);
+
+			// Update text
+			addr = (UInt32)client + 0x288A30;
+			SafeWriteBuf(addr, value, 35);
 		}
 
 	}
@@ -140,10 +154,19 @@ extern "C" __declspec(dllexport) void loaded_client()
 			GetPrivateProfileStringA("QuickSave",
 				"Text",
 				"Quick Save",
-				value, 20, ".\\Bin\\loader\\localization_addon.ini");
+				value, 36, ".\\Bin\\loader\\localization_addon.ini");
+				//value, 20, ".\\Bin\\loader\\localization_addon.ini");
 
-			addr = (UInt32)engine + 0x195FDC;
-			SafeWriteBuf(addr, value, 19);
+			//addr = (UInt32)engine + 0x195FDC;
+			//SafeWriteBuf(addr, value, 19);
+
+			// Update address
+			addr = (UInt32)engine + 0x98F02;
+			unsigned char QuickSaveAddress[2] = { 0xA0, 0x5F };
+			SafeWriteBuf(addr, QuickSaveAddress, 2);
+
+			addr = (UInt32)engine + 0x195FA0;
+			SafeWriteBuf(addr, value, 35);
 		}
 
 		// Auto Save
@@ -152,10 +175,19 @@ extern "C" __declspec(dllexport) void loaded_client()
 			GetPrivateProfileStringA("AutoSave",
 				"Text",
 				"Auto Save",
-				value, 13, ".\\Bin\\loader\\localization_addon.ini");
+				value, 36, ".\\Bin\\loader\\localization_addon.ini");
+				//value, 13, ".\\Bin\\loader\\localization_addon.ini");
 
-			addr = (UInt32)engine + 0x195FF0;
-			SafeWriteBuf(addr, value, 12);
+			//addr = (UInt32)engine + 0x195FF0;
+			//SafeWriteBuf(addr, value, 12);
+
+			// Update address
+			addr = (UInt32)engine + 0x990FB;
+			unsigned char AutoSaveAddress[2] = { 0xD0, 0x5F };
+			SafeWriteBuf(addr, AutoSaveAddress, 2);
+
+			addr = (UInt32)engine + 0x195FD0;
+			SafeWriteBuf(addr, value, 35);
 		}
 
 		//  d.- Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
@@ -170,8 +202,25 @@ extern "C" __declspec(dllexport) void loaded_client()
 			addr = (UInt32)engine + 0x1AD510;
 			SafeWriteBuf(addr, value, 11);
 		}
-
 	}
+
+	HMODULE GameUI = GetModuleHandleA("GameUI.dll");
+	if (GameUI != NULL)
+	{
+		//  f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
+		if (GetPrivateProfileIntA("Current", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("Current",
+                                     "Text",
+				                     "Current",
+                                     value, 8, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)GameUI + 0x64C7C;
+			SafeWriteBuf(addr, value, 7);
+		}
+	}
+
+
 
 // For tracing if we access .ini file
 	//char sample[37];
