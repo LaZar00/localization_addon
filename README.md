@@ -6,6 +6,7 @@ I decided to code this external module to avoid changing the original libraries 
  
 Author: L@Zar0\
 Date: 27/03/2025\
+Update: 16/04/2025\
 Version: 1.0 for spanish translation based on UP 11.5\
 Contact: formerly ClanDLAN.net member, now in Discord.
 
@@ -20,6 +21,7 @@ This module includes some updates for localized versions (coded for the spanish 
   
 		In any case, I prefer to avoid changing 'engine.dll' directly.
 * e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
+* f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 
 # Install
 
