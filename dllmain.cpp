@@ -189,19 +189,6 @@ extern "C" __declspec(dllexport) void loaded_client()
 			addr = (UInt32)engine + 0x195FD0;
 			SafeWriteBuf(addr, value, 35);
 		}
-
-		//  d.- Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
-		// Loading...
-		if (GetPrivateProfileIntA("Loading", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
-		{
-			GetPrivateProfileStringA("Loading",
-				"Text",
-				"Loading....",
-				value, 12, ".\\Bin\\loader\\localization_addon.ini");
-
-			addr = (UInt32)engine + 0x1AD510;
-			SafeWriteBuf(addr, value, 11);
-		}
 	}
 
 	HMODULE GameUI = GetModuleHandleA("GameUI.dll");
@@ -229,8 +216,6 @@ extern "C" __declspec(dllexport) void loaded_client()
 		}
 	}
 
-
-
 // For tracing if we access .ini file
 	//char sample[37];
 	//FILE* fout = fopen(".\\Bin\\loader\\test.txt", "wt");
@@ -238,4 +223,34 @@ extern "C" __declspec(dllexport) void loaded_client()
 	//fputs(sample, fout);
 	//fclose(fout);
 }
+
+extern "C" __declspec(dllexport) void loaded_engine()
+{
+	UInt32 addr;
+
+	HMODULE engine = GetModuleHandleA("engine.dll");
+	if (engine != NULL)
+	{
+		//  d.- Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
+		// Loading...
+		if (GetPrivateProfileIntA("Loading", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("Loading",
+				"Text",
+				"Loading....",
+				value, 12, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)engine + 0x1AD510;
+			SafeWriteBuf(addr, value, 11);
+		}
+	}
+
+	// For tracing if we access .ini file
+		//char sample[37];
+		//FILE* fout = fopen(".\\Bin\\loader\\test.txt", "wt");
+		//sprintf(sample, "%s", value);
+		//fputs(sample, fout);
+		//fclose(fout);
+}
+
 
