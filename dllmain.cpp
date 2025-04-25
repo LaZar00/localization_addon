@@ -19,6 +19,7 @@
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
 //  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
 //  f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
+//  g.- 'Name' text when creating new character.		(client.dll)
 
 #include "pch.h"
 #include <windows.h>
@@ -43,15 +44,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	return TRUE;
 }
 
-void SafeWriteBuf(UInt32 addr, void* data, UInt32 len)
-{
-	DWORD	oldProtect;
-
-	VirtualProtect((void*)addr, len, PAGE_EXECUTE_READWRITE, &oldProtect);
-	memcpy((void*)addr, data, len);
-	VirtualProtect((void*)addr, len, oldProtect, &oldProtect);
-}
-
 void SafeWrite8(UInt32 addr, UInt32 data)
 {
 	DWORD	oldProtect;
@@ -69,6 +61,22 @@ void SafeWrite32(UInt32 addr, UInt32 data)
 	*((UInt32*)addr) = data;
 	VirtualProtect((void*)addr, 4, oldProtect, &oldProtect);
 }
+
+void SafeWriteBuf(UInt32 addr, void* data, UInt32 len)
+{
+	DWORD	oldProtect;
+
+	VirtualProtect((void*)addr, len, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memcpy((void*)addr, data, len);
+	VirtualProtect((void*)addr, len, oldProtect, &oldProtect);
+}
+
+void SafeWriteBufWithOffsetChange(UInt32 addr_data, void* data, UInt32 offset, UInt32 len) {
+
+	SafeWriteBuf(addr_data, data, len);
+	SafeWrite32(offset, addr_data);
+}
+
 
 extern "C" __declspec(dllexport) void loaded_client()
 {
@@ -115,13 +123,29 @@ extern "C" __declspec(dllexport) void loaded_client()
 			//SafeWriteBuf(addr, value, 23);
 			
 			// Update address
-			addr = (UInt32)client + 0x54339;
-			unsigned char PressOneAddress[2] = { 0x30, 0x8A };
-			SafeWriteBuf(addr, PressOneAddress, 2);
+			SafeWriteBufWithOffsetChange((UInt32)client + 0x288A30, value, (UInt32)client + 0x54339, 35);
+
+			//addr = (UInt32)client + 0x54339;
+			//unsigned char PressOneAddress[2] = { 0x30, 0x8A };
+			//SafeWriteBuf(addr, PressOneAddress, 2);
+
+			//// Update text
+			//addr = (UInt32)client + 0x288A30;
+			//SafeWriteBuf(addr, value, 35);
+		}
+
+		//  g.- 'Name' text when creating new character.		(client.dll)
+		if (GetPrivateProfileIntA("Name", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("Name",
+									 "Text",
+								 	 "Name:",
+								 	 value, 36, ".\\Bin\\loader\\localization_addon.ini");
+									 // value, 24, ".\\Bin\\loader\\localization_addon.ini");
 
 			// Update text
-			addr = (UInt32)client + 0x288A30;
-			SafeWriteBuf(addr, value, 35);
+			addr = (UInt32)client + 0x2CFFF8;
+			SafeWriteBuf(addr, value, 7);
 		}
 
 	}
@@ -161,42 +185,32 @@ extern "C" __declspec(dllexport) void loaded_client()
 		if (GetPrivateProfileIntA("QuickSave", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("QuickSave",
-				"Text",
-				"Quick Save",
-				value, 36, ".\\Bin\\loader\\localization_addon.ini");
-				//value, 20, ".\\Bin\\loader\\localization_addon.ini");
+									 "Text",
+									 "Quick Save",
+									 value, 36, ".\\Bin\\loader\\localization_addon.ini");
+									 //value, 20, ".\\Bin\\loader\\localization_addon.ini");
 
-			//addr = (UInt32)engine + 0x195FDC;
+			//addr = (UInt32)engine + 0x195FDC;	// Original address
 			//SafeWriteBuf(addr, value, 19);
 
-			// Update address
-			addr = (UInt32)engine + 0x98F02;
-			unsigned char QuickSaveAddress[2] = { 0xA0, 0x5F };
-			SafeWriteBuf(addr, QuickSaveAddress, 2);
-
-			addr = (UInt32)engine + 0x195FA0;
-			SafeWriteBuf(addr, value, 35);
+			SafeWriteBufWithOffsetChange((UInt32)engine + 0x195FA0, value, (UInt32)engine + 0x98F02, 35);
 		}
 
 		// Auto Save
 		if (GetPrivateProfileIntA("AutoSave", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("AutoSave",
-				"Text",
-				"Auto Save",
-				value, 36, ".\\Bin\\loader\\localization_addon.ini");
-				//value, 13, ".\\Bin\\loader\\localization_addon.ini");
+									 "Text",
+									 "Auto Save",
+									 value, 36, ".\\Bin\\loader\\localization_addon.ini");
+									 //value, 13, ".\\Bin\\loader\\localization_addon.ini");
 
-			//addr = (UInt32)engine + 0x195FF0;
+			//addr = (UInt32)engine + 0x195FF0;	// Original address
 			//SafeWriteBuf(addr, value, 12);
 
 			// Update address
-			addr = (UInt32)engine + 0x990FB;
-			unsigned char AutoSaveAddress[2] = { 0xD0, 0x5F };
-			SafeWriteBuf(addr, AutoSaveAddress, 2);
+			SafeWriteBufWithOffsetChange((UInt32)engine + 0x195FD0, value, (UInt32)engine + 0x990FB, 35);
 
-			addr = (UInt32)engine + 0x195FD0;
-			SafeWriteBuf(addr, value, 35);
 		}
 	}
 
@@ -212,16 +226,12 @@ extern "C" __declspec(dllexport) void loaded_client()
                                      value, 16, ".\\Bin\\loader\\localization_addon.ini");
                                      //value, 8, ".\\Bin\\loader\\localization_addon.ini");
 
-			//addr = (UInt32)GameUI + 0x64C7C;
+			//addr = (UInt32)GameUI + 0x64C7C;	// Original address
 			//SafeWriteBuf(addr, value, 7);
 
 			// Update address
-			addr = (UInt32)GameUI + 0x1838B;
-			unsigned char CurrentAddress[2] = { 0xDC, 0x67 };
-			SafeWriteBuf(addr, CurrentAddress, 2);
-
-			addr = (UInt32)GameUI + 0x667DC;
-			SafeWriteBuf(addr, value, 16);
+			SafeWriteBufWithOffsetChange((UInt32)GameUI + 0x667DC, value, (UInt32)GameUI + 0x1838B, 16);
+		
 		}
 	}
 
@@ -287,9 +297,9 @@ extern "C" __declspec(dllexport) void loaded_engine()
 		if (GetPrivateProfileIntA("Loading", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("Loading",
-						 "Text",
-						 "Loading....",
-						 (LPSTR)pushText, 101, ".\\Bin\\loader\\localization_addon.ini");
+									 "Text",
+									 "Loading....",
+									 (LPSTR)pushText, 101, ".\\Bin\\loader\\localization_addon.ini");
 
 			WriteRelLibCall((UInt32)engine + 0xFCD32, (UInt32)DrawTextHook);
 
