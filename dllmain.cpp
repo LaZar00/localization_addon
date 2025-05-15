@@ -7,10 +7,10 @@
 // Contact: formerly ClanDLAN.net member, now in Discord.
 
 // This module includes some updates for the spanish translation:
-//	a.-	Now the '$' symbol of the money appears at the right of the value	(client.dll)
-//  b.- Months and Days names									(FileSystem_Stdio.dll)
-//  c.- 'Quick Save' and 'Auto Save' words						(engine.dll)
-//  d.- Initial 'Loading...' word -máx 10 chars with points-	(engine.dll)
+//	a.-	Now the '$' symbol of the money appears at the right of the value					(client.dll)
+//  b.- Months and Days names																(FileSystem_Stdio.dll)
+//  c.- 'Quick Save' and 'Auto Save' words													(engine.dll)
+//  d.- Initial 'Loading...' word -máx 10 chars with points-								(engine.dll)
 //		This text appears 2 times:
 //			1. When we run for first time Vampire.exe. In this case, loader has not
 //			   reached yet the module and updated any text.
@@ -18,13 +18,15 @@
 //			   In this case, the loader has reached the module and has updated texts.
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
 //  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
-//  f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
-//  g.- 'Name' text when creating new character.		(client.dll)
+//  f.- 'Current' text when saving a new game, in the date/time column.						(GameUI.dll)
+//  g.- 'Name' text when creating new character.											(client.dll)
+//  i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
 
 #include "pch.h"
 #include <windows.h>
 #include <winbase.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef unsigned char			UInt8;
 typedef short unsigned int		UInt16;
@@ -35,6 +37,28 @@ char value[37] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 				   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 				   0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
+
+const char* valueeffectStr;
+char valueeffect[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+				   0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+const char* costStr;
+char cost[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+				  0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+const char* durationStr;
+char duration[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+					  0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+const char* damageStr;
+char damage[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+					0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+
+const char* effectQuantStr[5];
+const char* plusStr = "+\0";
+const char* multStr = "*\0";
+const char* divStr = "/\0";
+char max[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+			     0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+char min[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+				 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 				   	  DWORD  ul_reason_for_call,
@@ -75,6 +99,51 @@ void SafeWriteBufWithOffsetChange(UInt32 addr_data, void* data, UInt32 offset, U
 
 	SafeWriteBuf(addr_data, data, len);
 	SafeWrite32(offset, addr_data);
+}
+
+unsigned char* Read8BytesBuffer(UInt32 addr_data) {
+	unsigned char fontBuffer[8];
+	unsigned char* p;
+
+	for (int i = 0; i < 8; i++)
+	{
+		p = (unsigned char*)(addr_data + i);
+		fontBuffer[i] = *p;
+	}
+		
+	return fontBuffer;
+}
+
+char* ConvertByte2String(int bufByte) {
+	char binaryString[10];
+	char mask = 1; // Bit mask
+
+	for (int i = 0; i < 8; i++) {
+		// Mask each bit in the byte and store it
+		if ((bufByte & (mask << i)) != 0) {
+			binaryString[7 - i] = '#';
+		}
+		else {
+			binaryString[7 - i] = '.';
+		}
+	}
+	binaryString[8] = 0xA;
+	binaryString[9] = 0x0;
+
+	return binaryString;
+}
+
+void ConvertDBStringToByteArray(char* byteBuf, char* byteArray, int len) {	// Convert Double Byte String to Byte Array
+	char cByte[3];
+	int i;
+
+	for (i = 0; i < len; i++) {
+		cByte[0] = byteBuf[i * 2];
+		cByte[1] = byteBuf[(i * 2) + 1];
+		cByte[2] = 0;
+
+		byteArray[i] = strtol(cByte, NULL, 16);
+	}
 }
 
 
@@ -140,12 +209,151 @@ extern "C" __declspec(dllexport) void loaded_client()
 			GetPrivateProfileStringA("Name",
 									 "Text",
 								 	 "Name:",
-								 	 value, 36, ".\\Bin\\loader\\localization_addon.ini");
+								 	 value, 8, ".\\Bin\\loader\\localization_addon.ini");
 									 // value, 24, ".\\Bin\\loader\\localization_addon.ini");
 
 			// Update text
 			addr = (UInt32)client + 0x2CFFF8;
 			SafeWriteBuf(addr, value, 7);
+		}
+
+		// h.- Localize the words for Trait Effects like "Duration"/"Damage"... (thanks to Niko from Planet Vampire Discord)
+		if (GetPrivateProfileIntA("Effects", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			// Value
+			GetPrivateProfileStringA("Effects",
+									 "ValueEffect",
+									 "Value",
+									 valueeffect, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)client + 0x156BDF + 2;
+			valueeffect[15] = '\0';
+			valueeffectStr = valueeffect;
+			SafeWrite32(addr, (UInt32)(&valueeffectStr));
+
+			// Cost
+			GetPrivateProfileStringA("Effects",
+								 	 "Cost",
+								 	 "Cost",
+									 cost, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)client + 0x156BDF + 1;
+			cost[15] = '\0';
+			costStr = cost;
+			SafeWrite32(addr, (UInt32)(&costStr));
+
+			// Duration
+			GetPrivateProfileStringA("Effects",
+									 "Duration",
+									 "Duration",
+									 duration, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)client + 0x156E4C + 1;
+			duration[15] = '\0';
+			durationStr = duration;
+			SafeWrite32(addr, (UInt32)&durationStr);
+
+			// Damage
+			GetPrivateProfileStringA("Effects",
+									 "Damage",
+									 "Damage",
+									 damage, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			addr = (UInt32)client + 0x156E31 + 1;
+			damage[15] = '\0';
+			damageStr = damage;
+			SafeWrite32(addr, (UInt32)(&damageStr));
+
+
+			// +, *, /, Max, Min	In this case we need an array of pointers
+			effectQuantStr[0] = plusStr;
+			effectQuantStr[1] = multStr;
+			effectQuantStr[2] = divStr;
+
+			// Max
+			GetPrivateProfileStringA("Effects",
+									 "Max",
+									 "Max",
+									 max, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			max[15] = '\0';
+			effectQuantStr[3] = max;
+
+			// Min
+			GetPrivateProfileStringA("Effects",
+									 "Min",
+									 "Min",
+									 min, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			min[15] = '\0';
+			effectQuantStr[4] = min;
+
+			addr = ((UInt32)client + 0x156E67 + 3);
+			SafeWrite32(addr, (UInt32)(&effectQuantStr));
+		}
+
+		// i.- Fix Terminal font
+		addr = (UInt32)client + 0x232F10;
+
+		// ExportTable Debug Function
+		if (GetPrivateProfileIntA("TerminalFontUpdate", "ExportTable_Debug", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			unsigned char* bufBytes;
+			int i, j;
+			char strfnt[100];
+
+			FILE* fout = fopen(".\\Bin\\loader\\ExportTableTerminalFontDebug.txt", "wt");
+
+			for (i = 0; i < 141; i++) // 141: Max available chars in table for terminal font
+			{
+				bufBytes = Read8BytesBuffer(addr + (i * 8));
+
+				sprintf(strfnt, "Char: %i\n", i);
+				fputs(strfnt, fout);
+
+				fputs(ConvertByte2String(bufBytes[0]), fout);
+				fputs(ConvertByte2String(bufBytes[1]), fout);
+				fputs(ConvertByte2String(bufBytes[2]), fout);
+				fputs(ConvertByte2String(bufBytes[3]), fout);
+				fputs(ConvertByte2String(bufBytes[4]), fout);
+				fputs(ConvertByte2String(bufBytes[5]), fout);
+				fputs(ConvertByte2String(bufBytes[6]), fout);
+				fputs(ConvertByte2String(bufBytes[7]), fout);
+
+				//sprintf(strfnt, "Char: %i\n%i\n%i\n%i\n%i\n%i\n%i\n%i\n%i\n\n", i, bufBytes[0], bufBytes[1], bufBytes[2], bufBytes[3], bufBytes[4], bufBytes[5], bufBytes[6], bufBytes[7]);
+				//fputs(strfnt, fout);
+
+				sprintf(strfnt, "\n");
+				fputs(strfnt, fout);
+			}
+
+			fclose(fout);
+
+		}
+
+		// Fix Fonts
+		// Only the fonts assigned in .ini will be updated.
+		if (GetPrivateProfileIntA("TerminalFontUpdate", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			int i;
+			char numchar[4];
+			char strfnt[17];
+			char byteArray[8];
+
+			for (i = 0; i < 141; i++)
+			{
+				sprintf(numchar, "%i", i);
+				GetPrivateProfileStringA("TerminalFontUpdate",
+										 numchar,
+										 "",
+										 strfnt, 17, ".\\Bin\\loader\\localization_addon.ini");
+
+				if (strlen(strfnt)  > 0)
+				{
+					ConvertDBStringToByteArray(strfnt, byteArray, 8);
+					SafeWriteBuf(addr + (i * 8), byteArray, 8);
+				}
+			}
 		}
 
 	}
