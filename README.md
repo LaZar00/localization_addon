@@ -22,7 +22,7 @@ This module includes some updates for localized versions (coded for the spanish 
 * e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
 * f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 * g.- 'Name' text when creating new character.											(client.dll)
-* h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)
+* h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)\
       -thanks to Niko from Planet Vampire Discord-
 * i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
 * j.-	This will fix the counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
