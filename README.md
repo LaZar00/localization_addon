@@ -23,7 +23,7 @@ This module includes some updates for localized versions (coded for the spanish 
 * f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 * g.- 'Name' text when creating new character.											(client.dll)
 * h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)
-*     (thanks to Niko from Planet Vampire Discord)
+*     -thanks to Niko from Planet Vampire Discord-
 * i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
 * j.-	This will fix the counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
 * k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal"			(vampire.dll)
