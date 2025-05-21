@@ -19,7 +19,7 @@ This module includes some updates for localized versions (coded for the spanish 
 		This text appears 2 times:\
   		1. When we run for first time Vampire.exe.\
 		2. After loading modules, and before intro cinematics.
-* e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
+* e.- When no voiced dialogue files are present the game shows (press 1 to continue)	(client.dll)
 * f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
 * g.- 'Name' text when creating new character.											(client.dll)
 * h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)\
