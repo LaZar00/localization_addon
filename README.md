@@ -6,8 +6,8 @@ I decided to code this external module to avoid changing the original libraries 
  
 Author: L@Zar0\
 Date: 27/03/2025\
-Update: 16/04/2025\
-Version: 1.0 for spanish translation based on UP 11.5\
+Update: 21/05/2025\
+Version: 1.9 for spanish translation based on UP 11.5\
 Contact: formerly ClanDLAN.net member, now in Discord.
 
 This module includes some updates for localized versions (coded for the spanish translation):
@@ -21,6 +21,13 @@ This module includes some updates for localized versions (coded for the spanish 
 		2. After loading modules, and before intro cinematics.
 * e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)	(client.dll)
 * f.- 'Current' text when saving a new game, in the date/time column.		(GameUI.dll)
+* g.- 'Name' text when creating new character.											(client.dll)
+* h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)
+*     (thanks to Niko from Planet Vampire Discord)
+* i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
+* j.-	This will fix the counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
+* k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal"			(vampire.dll)
+* l.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)
 
 # Install
 
