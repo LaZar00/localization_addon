@@ -25,7 +25,7 @@ This module includes some updates for localized versions (coded for the spanish 
 * h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)\
           -thanks to Niko from Planet Vampire Discord-
 * i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
-* j.-	This will fix the counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
+* j.- Minor fix for counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
 * k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal" in terminals			(vampire.dll)
 * l.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)
 
