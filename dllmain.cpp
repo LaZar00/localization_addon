@@ -20,7 +20,13 @@
 //  e.- When no .vcd/.mp3 files are present the game shows (press 1 to continue)			(client.dll)
 //  f.- 'Current' text when saving a new game, in the date/time column.						(GameUI.dll)
 //  g.- 'Name' text when creating new character.											(client.dll)
+//  h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)
+//      (thanks to Niko from Planet Vampire Discord)
 //  i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
+//	j.-	This will fix the counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
+//  k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal"			(vampire.dll)
+//  l.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)
+
 
 #include "pch.h"
 #include <windows.h>
@@ -40,7 +46,7 @@ char value[37] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 
 const char* valueeffectStr;
 char valueeffect[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-				   0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+						 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 const char* costStr;
 char cost[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 				  0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
@@ -50,6 +56,12 @@ char duration[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 const char* damageStr;
 char damage[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 					0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+
+char quitWord[16] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+					  0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+char quitWordHackcmd[24] = { 'h', 'a', 'c', 'k', 'c', 'm', 'd', ' ',
+							 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+							 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 
 const char* effectQuantStr[5];
 const char* plusStr = "+\0";
@@ -356,6 +368,96 @@ extern "C" __declspec(dllexport) void loaded_client()
 			}
 		}
 
+		// l. - Pressing ESC in terminal it writes "quit" word automatically.Must much Name33 string.txt word.	(client.dll)
+		if (GetPrivateProfileIntA("QuitESCTerminal", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("QuitESCTerminal",
+									 "quit",
+									 "quit",
+									 quitWord, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			// There are two addresses accesing to "hackcmd quit" in code
+			quitWord[15] = '\0';
+			for (int i = 0; i < 16; i++) quitWordHackcmd[i + 8] = quitWord[i];			
+
+			addr = (UInt32)client + 0x0C7177 + 1;
+			SafeWrite32(addr, (UInt32)(&quitWordHackcmd));
+
+			addr = (UInt32)client + 0x0C7220 + 1;
+			SafeWrite32(addr, (UInt32)(&quitWordHackcmd));
+		}
+
+	}
+
+	HMODULE vampire = GetModuleHandleA("vampire.dll");
+	if (vampire != NULL)
+	{
+		// k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal"			(vampire.dll) 
+		if (GetPrivateProfileIntA("SwapSubDirNameMenuWord", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			addr = ((UInt32)vampire + 0x21ADBF);
+			SafeWrite8(addr, 0x51);
+			addr = ((UInt32)vampire + 0x21ADC0);
+			SafeWrite8(addr, 0x50);
+		}
+
+		// l.- Fixes for bottom menu for [n]ext, [p]rev, [d]elete, [m]enu and (From:/Subject:)
+		if (GetPrivateProfileIntA("FixBottomMenu", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			unsigned char buffer[20] = { 0x0A, 0x25, 0x73, 0x2C, 0x20, 0x25, 0x73, 0x2C, 0x20, 0x25,
+										 0x73, 0x2C, 0x20, 0x25, 0x73, 0x20, 0x25, 0x73, 0x3A, 0x20 };
+			addr = ((UInt32)vampire + 0x5B06B4);
+			SafeWriteBuf(addr, buffer, 20);
+
+			unsigned char buffer2[9] = { 0x0A, 0x28, 0x25, 0x73, 0x29, 0x20, 0x25, 0x73, 0x0A };
+			addr = ((UInt32)vampire + 0x5B06E2);
+			SafeWriteBuf(addr, buffer2, 9);
+		}
+
+	}
+
+	HMODULE vguimatsurface = GetModuleHandleA("vguimatsurface.dll");
+	if (client != NULL)
+	{
+		//	j.-	This will fix the counting/showing of ANSI chars over 0x80
+		if (GetPrivateProfileIntA("CharsOver0x80Fix", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+
+			// changes char (supposedly signed) to unsigned int8 in the comparision
+			addr = ((UInt32)vguimatsurface + 0x10BCA);
+			SafeWrite8(addr, 0x77);
+
+			// changes char (supposedly signed) to unsigned int8 in the char array
+			addr = ((UInt32)vguimatsurface + 0x10D2D);
+			SafeWrite8(addr, 0xB6);
+
+			// table to mark countable/showable chars over 0x80
+			addr = ((UInt32)vguimatsurface + 0x3B602);
+			SafeWrite8(addr, 0x01);
+
+			addr = ((UInt32)vguimatsurface + 0x3B622);
+			SafeWrite8(addr, 0x02);
+
+			addr = ((UInt32)vguimatsurface + 0x3B632);
+			unsigned char tablecharsover0x80[128] = {
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00, 01, 00, 01, 00, 01, 00,
+								   01, 00, 01, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00, 02, 00, 02, 00, 02, 00,
+								   02, 00, 02, 00
+								};
+			
+			SafeWriteBuf(addr, tablecharsover0x80, 128);
+		}
 	}
 
 	HMODULE FileSystem_Stdio = GetModuleHandleA("FileSystem_Stdio.dll");
