@@ -17,15 +17,16 @@
 //			2. After loading modules, and before intro cinematics.
 //			   In this case, the loader has reached the module and has updated texts.
 //		In any case, I prefer to avoid changing 'engine.dll' directly.
-//  e.- When no voiced files are present the game shows "(press 1 to continue)"			(client.dll)
+//  e.- When no voiced files are present the game shows "(press 1 to continue)"				(client.dll)
 //  f.- 'Current' text when saving a new game, in the date/time column.						(GameUI.dll)
 //  g.- 'Name' text when creating new character.											(client.dll)
 //  h.- Localize the words for Trait Effects like "Duration" / "Damage"...					(client.dll)
 //      -thanks to Niko from Planet Vampire Discord-
 //  i.- Fix Terminal font updating chars from external file (.ini)							(client.dll)
-//	j.-	Minor fix for counting/showing of ANSI chars over 0x80							(vguimatsurface.dll)
+//	j.-	Minor fix for counting/showing of ANSI chars over 0x80								(vguimatsurface.dll)
 //  k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal"			(vampire.dll)
-//  l.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)
+//  l.- Fixes for bottom menu for [n]ext, [p]rev, [d]elete, [m]enu and (From:/Subject:)		(vampire.dll)
+//  m.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)+(vampire.dll)
 
 
 #include "pch.h"
@@ -368,7 +369,7 @@ extern "C" __declspec(dllexport) void loaded_client()
 			}
 		}
 
-		// l. - Pressing ESC in terminal it writes "quit" word automatically.Must much Name33 string.txt word.	(client.dll)
+		// m. - Pressing ESC in terminal it writes "quit" word automatically.Must much Name33 string.txt word.	(client.dll)
 		if (GetPrivateProfileIntA("QuitESCTerminal", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
 		{
 			GetPrivateProfileStringA("QuitESCTerminal",
@@ -413,6 +414,25 @@ extern "C" __declspec(dllexport) void loaded_client()
 			unsigned char buffer2[9] = { 0x0A, 0x28, 0x25, 0x73, 0x29, 0x20, 0x25, 0x73, 0x0A };
 			addr = ((UInt32)vampire + 0x5B06E2);
 			SafeWriteBuf(addr, buffer2, 9);
+		}
+
+		// m. - Pressing ESC in terminal it writes "quit" word automatically.Must much Name33 string.txt word.	(vampire.dll)
+		if (GetPrivateProfileIntA("QuitESCTerminal", "enabled", 0, ".\\Bin\\loader\\localization_addon.ini"))
+		{
+			GetPrivateProfileStringA("QuitESCTerminal",
+				"quit",
+				"quit",
+				quitWord, 16, ".\\Bin\\loader\\localization_addon.ini");
+
+			// Here there is only one address and it does not use the 'hackcmd' command.
+			// This one is used in keypads
+			quitWord[15] = '\0';
+
+			addr = (UInt32)vampire + 0x217F94;
+			SafeWrite32(addr, (UInt32)(&quitWord));
+
+			addr = (UInt32)vampire + 0x21DEE3;
+			SafeWrite32(addr, (UInt32)(&quitWord));
 		}
 
 	}
