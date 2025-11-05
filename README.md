@@ -6,8 +6,8 @@ I decided to code this external module to avoid changing the original libraries 
  
 Author: L@Zar0\
 Date: 27/03/2025\
-Update: 01/06/2025\
-Version: 1.9c for spanish translation based on UP 11.5\
+Update: 05/11/2025\
+Version: 1.9d for spanish translation based on UP 11.5\
 Contact: formerly ClanDLAN.net member, now in Discord.
 
 This module includes some updates for localized versions (coded for the spanish translation):
@@ -29,6 +29,7 @@ This module includes some updates for localized versions (coded for the spanish 
 * k.- Swap Subdir name/"Menu" word, example: "Personnel Menu"->"Menú Personal" in terminals		(vampire.dll)
 * l.- Fixes for bottom menu for [n]ext, [p]rev, [d]elete, [m]enu and (From:/Subject:)			(vampire.dll)
 * m.- Pressing ESC in terminal it writes "quit" word automatically. Must much Name33 string.txt word.	(client.dll)+(vampire.dll)
+* n.- Added mouse key bindingj for fix localized language							(GameUI.dll)
 
 # Install
 
