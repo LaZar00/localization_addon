@@ -2,9 +2,10 @@
 // This module is for the game Vampire: The Masquerade - Bloodlines
 // 
 // Author: L@Zar0
-// Date: 27/03/2025
-// Version: 1.0 for spanish translation based on UP 11.5 (rc14.1)
-// Contact: formerly ClanDLAN.net member, now in Discord.
+// Initial Date: 27/03/2025
+// Update Date:  05/11/2025
+// Version: 1.9d for spanish translation based on UP 11.5.38
+// Contact: formerly ClanDLAN.net member, now in ClanDLAN Discord.
 
 // This module includes some updates for the spanish translation:
 //	a.-	Now the '$' symbol of the money appears at the right of the value					(client.dll)
